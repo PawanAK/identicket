@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 
 function ValidationResult() {
   const location = useLocation();
+  const navigate = useNavigate();
   const ticketData = location.state?.ticketData;
   const [validationStatus, setValidationStatus] = useState(null);
   const [eta, setEta] = useState(null);
@@ -23,6 +24,15 @@ function ValidationResult() {
       }
     }
   }, [ticketData]);
+
+  useEffect(() => {
+    if (validationStatus !== null) {
+      const timer = setTimeout(() => {
+        navigate('/');
+      }, 15000);
+      return () => clearTimeout(timer);
+    }
+  }, [validationStatus, navigate]);
 
   const validateTicket = async (data) => {
     console.log('Validating ticket...');
