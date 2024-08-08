@@ -65,7 +65,7 @@ function ValidationResult() {
       const toIndex = stations.indexOf(data.end) + 1;
 
       const response = await fetch('https://637b-103-216-234-205.ngrok-free.app/predict_eta', {
-        method: 'OPTIONS',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
