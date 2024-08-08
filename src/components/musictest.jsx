@@ -6,7 +6,7 @@ const MusicTest = () => {
 
   const generateAndPlayAudio = async () => {
     try {
-      const response = await fetch('http://localhost:3000/generate-tts', {
+      const response = await fetch('https://ticket-backend-j37d.onrender.com/ticket/generate-tts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

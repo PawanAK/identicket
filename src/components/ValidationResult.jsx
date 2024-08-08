@@ -92,7 +92,7 @@ function ValidationResult() {
 
   const generateAndPlayAudio = async (etaMessage) => {
     try {
-      const response = await fetch('https://your-backend-url.com/generate-tts', {
+      const response = await fetch('https://ticket-backend-j37d.onrender.com/ticket/generate-tts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
