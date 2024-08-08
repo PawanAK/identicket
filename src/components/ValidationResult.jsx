@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 
 function ValidationResult() {
   const location = useLocation();
   const ticketData = location.state?.ticketData;
+  const [validationStatus, setValidationStatus] = useState(null);
 
   let parsedData;
   try {
@@ -27,9 +28,13 @@ function ValidationResult() {
         if (data.isvalid === 1) {
           // Update the ticket validation status on the server
           await axios.post(`https://ticket-backend-j37d.onrender.com/ticket/${parsedData.ticketId}/validate`);
+          setValidationStatus(true);
+        } else {
+          setValidationStatus(false);
         }
       } catch (error) {
         console.error('Error validating ticket:', error);
+        setValidationStatus(false);
       }
     };
 
@@ -50,8 +55,8 @@ function ValidationResult() {
             <DataField label="Created At" value={new Date(parsedData.createdAt).toLocaleString()} />
             <DataField
               label="Validation Status"
-              value={parsedData.validationStatus ? 'Valid' : 'Invalid'}
-              className={parsedData.validationStatus ? 'text-green-600' : 'text-red-600'}
+              value={validationStatus === true ? 'Valid' : validationStatus === false ? 'Invalid' : 'Validating...'}
+              className={validationStatus === true ? 'text-green-600' : validationStatus === false ? 'text-red-600' : ''}
             />
           </div>
         </div>
