@@ -7,6 +7,7 @@ function ValidationResult() {
   const [validationStatus, setValidationStatus] = useState(null);
   const [eta, setEta] = useState(null);
   const [parsedData, setParsedData] = useState(null);
+  const [audioUrl, setAudioUrl] = useState(null);
 
   const stations = ['Margao', 'Vasco da Gama', 'Ponda', 'Mapusa'];
 
@@ -80,6 +81,7 @@ function ValidationResult() {
       console.log('ETA prediction response:', responseData);
       if (responseData.data) {
         setEta(responseData.data);
+        generateAndPlayAudio(responseData.data);
       } else {
         console.error('Unexpected ETA response format');
       }
@@ -87,6 +89,33 @@ function ValidationResult() {
       console.error('Error predicting ETA:', error);
     }
   };
+
+  const generateAndPlayAudio = async (etaMessage) => {
+    try {
+      const response = await fetch('https://your-backend-url.com/generate-tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: etaMessage }),
+      });
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      setAudioUrl(audioUrl);
+    } catch (error) {
+      console.error('Error generating audio:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play().catch(error => console.error('Error playing audio:', error));
+      return () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+    }
+  }, [audioUrl]);
 
   const formatTimestamp = (timestamp) => {
     return new Date(timestamp * 1000).toLocaleString();
