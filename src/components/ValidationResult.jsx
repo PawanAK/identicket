@@ -5,6 +5,9 @@ function ValidationResult() {
   const location = useLocation();
   const ticketData = location.state?.ticketData;
   const [validationStatus, setValidationStatus] = useState(null);
+  const [eta, setEta] = useState(null);
+
+  const stations = ['Margao', 'Vasco da Gama', 'Ponda', 'Mapusa'];
 
   let parsedData;
   try {
@@ -16,7 +19,7 @@ function ValidationResult() {
   useEffect(() => {
     const validateTicket = async () => {
       try {
-        const response = await fetch('https://92bc-103-216-232-99.ngrok-free.app/validate_otp', {
+        const response = await fetch('https://637b-103-216-234-205.ngrok-free.app/validate_otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -45,7 +48,32 @@ function ValidationResult() {
       }
     };
 
+    const predictEta = async () => {
+      try {
+        const fromIndex = stations.indexOf(parsedData.start) + 1;
+        const toIndex = stations.indexOf(parsedData.end) + 1;
+
+        const response = await fetch('https://637b-103-216-234-205.ngrok-free.app/predict_eta', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: fromIndex,
+            to: toIndex,
+            day_of_the_week: 1
+          }),
+        });
+
+        const data = await response.json();
+        setEta(data.eta);
+      } catch (error) {
+        console.error('Error predicting ETA:', error);
+      }
+    };
+
     validateTicket();
+    predictEta();
   }, [parsedData]);
 
   return (
@@ -64,6 +92,10 @@ function ValidationResult() {
               label="Validation Status"
               value={validationStatus === true ? 'Valid' : validationStatus === false ? 'Invalid' : 'Validating...'}
               className={validationStatus === true ? 'text-green-600' : validationStatus === false ? 'text-red-600' : ''}
+            />
+            <DataField
+              label="Estimated Travel Time"
+              value={eta ? `${eta} minutes` : 'Calculating...'}
             />
           </div>
         </div>
