@@ -78,7 +78,11 @@ function ValidationResult() {
 
       const responseData = await response.json();
       console.log('ETA prediction response:', responseData);
-      setEta(responseData);
+      if (responseData.data) {
+        setEta(responseData.data);
+      } else {
+        console.error('Unexpected ETA response format');
+      }
     } catch (error) {
       console.error('Error predicting ETA:', error);
     }
@@ -125,7 +129,7 @@ function ValidationResult() {
           <DataField label="Timestamp" value={formatTimestamp(parsedData.timestamp)} />
           <DataField
             label="Estimated Travel Time"
-            value={eta ? `${eta} minutes` : 'Calculating...'}
+            value={eta || 'Calculating...'}
             className="font-semibold"
           />
         </div>
