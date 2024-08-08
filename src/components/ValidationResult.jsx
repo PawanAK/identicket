@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import axios from 'axios';
 
 function ValidationResult() {
   const location = useLocation();
@@ -17,17 +16,25 @@ function ValidationResult() {
   useEffect(() => {
     const validateTicket = async () => {
       try {
-        const response = await axios.post('https://92bc-103-216-232-99.ngrok-free.app/validate_otp', {
-          party_ids_to_store_ids: parsedData.storeId,
-          program_id: parsedData.computeId,
-          seed: parsedData.username,
-          otp: parsedData.otp,
+        const response = await fetch('https://92bc-103-216-232-99.ngrok-free.app/validate_otp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            party_ids_to_store_ids: parsedData.storeId,
+            program_id: parsedData.computeId,
+            seed: parsedData.username,
+            otp: parsedData.otp,
+          }),
         });
 
-        const { data } = response.data;
+        const { data } = await response.json();
         if (data.isvalid === 1) {
           // Update the ticket validation status on the server
-          await axios.post(`https://ticket-backend-j37d.onrender.com/ticket/${parsedData.ticketId}/validate`);
+          await fetch(`https://ticket-backend-j37d.onrender.com/ticket/${parsedData.ticketId}/validate`, {
+            method: 'POST',
+          });
           setValidationStatus(true);
         } else {
           setValidationStatus(false);
