@@ -16,7 +16,7 @@ function ValidationResult() {
   useEffect(() => {
     const validateTicket = async () => {
       try {
-        const response = await fetch('https://92bc-103-216-232-99.ngrok-free.app/validate_otp', {
+        const response = await fetch('https://637b-103-216-234-205.ngrok-free.app/validate_otp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
