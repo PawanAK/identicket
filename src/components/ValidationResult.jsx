@@ -14,9 +14,9 @@ function ValidationResult() {
     if (ticketData) {
       try {
         const parsed = JSON.parse(ticketData);
+        console.log('Parsed ticket data:', parsed);
         setParsedData(parsed);
         validateTicket(parsed);
-        predictEta(parsed);
       } catch (error) {
         console.error('Error parsing ticket data:', error);
       }
@@ -24,6 +24,7 @@ function ValidationResult() {
   }, [ticketData]);
 
   const validateTicket = async (data) => {
+    console.log('Validating ticket...');
     try {
       const response = await fetch('https://637b-103-216-234-205.ngrok-free.app/validate_otp', {
         method: 'POST',
@@ -39,14 +40,17 @@ function ValidationResult() {
       });
 
       const { data: responseData } = await response.json();
+      console.log('Validation response:', responseData);
       if (responseData.isvalid === 1) {
-        // Update the ticket validation status on the server
         await fetch(`https://ticket-backend-j37d.onrender.com/ticket/${data.ticketId}/validate`, {
           method: 'POST',
         });
         setValidationStatus(true);
+        console.log('Ticket validated successfully');
+        predictEta(data);
       } else {
         setValidationStatus(false);
+        console.log('Ticket validation failed');
       }
     } catch (error) {
       console.error('Error validating ticket:', error);
@@ -55,12 +59,13 @@ function ValidationResult() {
   };
 
   const predictEta = async (data) => {
+    console.log('Predicting ETA...');
     try {
       const fromIndex = stations.indexOf(data.start) + 1;
       const toIndex = stations.indexOf(data.end) + 1;
 
       const response = await fetch('https://637b-103-216-234-205.ngrok-free.app/predict_eta', {
-        method: 'POST',
+        method: 'OPTIONS',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -72,6 +77,7 @@ function ValidationResult() {
       });
 
       const responseData = await response.json();
+      console.log('ETA prediction response:', responseData);
       setEta(responseData.eta);
     } catch (error) {
       console.error('Error predicting ETA:', error);
