@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import axios from 'axios';
 
 function ValidationResult() {
   const location = useLocation();
@@ -12,11 +13,28 @@ function ValidationResult() {
     console.error('Error parsing ticket data:', error);
   }
 
-  const ticketId=parsedData.ticketId;
+  useEffect(() => {
+    const validateTicket = async () => {
+      try {
+        const response = await axios.post('https://92bc-103-216-232-99.ngrok-free.app/validate_otp', {
+          party_ids_to_store_ids: parsedData.storeId,
+          program_id: parsedData.computeId,
+          seed: parsedData.username,
+          otp: parsedData.otp,
+        });
 
-  const ticketInfo = axios.get(`https://ticket-backend-j37d.onrender.com/ticket/${ticketId}`)
-  
-  console.log(ticketInfo)
+        const { data } = response.data;
+        if (data.isvalid === 1) {
+          // Update the ticket validation status on the server
+          await axios.post(`https://ticket-backend-j37d.onrender.com/ticket/${parsedData.ticketId}/validate`);
+        }
+      } catch (error) {
+        console.error('Error validating ticket:', error);
+      }
+    };
+
+    validateTicket();
+  }, [parsedData]);
 
   return (
     <div className="max-w-md mx-auto text-center p-6">
@@ -30,7 +48,11 @@ function ValidationResult() {
             <DataField label="To" value={parsedData.end} />
             <DataField label="Price" value={`$${parsedData.price}`} />
             <DataField label="Created At" value={new Date(parsedData.createdAt).toLocaleString()} />
-            <DataField label="Validation Status" value={parsedData.validationStatus ? 'Valid' : 'Invalid'} />
+            <DataField
+              label="Validation Status"
+              value={parsedData.validationStatus ? 'Valid' : 'Invalid'}
+              className={parsedData.validationStatus ? 'text-green-600' : 'text-red-600'}
+            />
           </div>
         </div>
       ) : (
@@ -43,11 +65,11 @@ function ValidationResult() {
   );
 }
 
-function DataField({ label, value }) {
+function DataField({ label, value, className }) {
   return (
     <div>
       <p className="font-semibold text-gray-600">{label}</p>
-      <p className="text-black">{value}</p>
+      <p className={`text-black ${className}`}>{value}</p>
     </div>
   );
 }
