@@ -12,6 +12,12 @@ function ValidationResult() {
     console.error('Error parsing ticket data:', error);
   }
 
+  const ticketId=parsedData.ticketId;
+
+  const ticketInfo = axios.get(`https://ticket-backend-j37d.onrender.com/ticket/${ticketId}`)
+  
+  console.log(ticketInfo)
+
   return (
     <div className="max-w-md mx-auto text-center p-6">
       <h1 className="text-3xl font-bold mb-6">Ticket Details</h1>
