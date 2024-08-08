@@ -29,7 +29,7 @@ function ValidationResult() {
     if (validationStatus !== null) {
       const timer = setTimeout(() => {
         navigate('/');
-      }, 15000);
+      }, 120000);
       return () => clearTimeout(timer);
     }
   }, [validationStatus, navigate]);
