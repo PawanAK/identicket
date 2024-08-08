@@ -78,7 +78,7 @@ function ValidationResult() {
 
       const responseData = await response.json();
       console.log('ETA prediction response:', responseData);
-      setEta(responseData.eta);
+      setEta(responseData);
     } catch (error) {
       console.error('Error predicting ETA:', error);
     }
